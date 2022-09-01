@@ -1,0 +1,32 @@
+{
+  "name": "nextsys-adserver",
+  "version": "1.0.0",
+  "description": "adserver for nextsys",
+  "main": "app.js",
+  "scripts": {
+    "start": "node app.js",
+    "server": "nodemon app.js"
+  },
+  "keywords": [
+    "adserver"
+  ],
+  "author": "mohit sengar",
+  "license": "ISC",
+  "dependencies": {
+    "arangojs": "^7.8.0",
+    "bowser": "^2.11.0",
+    "cookie-parser": "^1.4.6",
+    "cors": "^2.8.5",
+    "dotenv": "^16.0.2",
+    "express": "^4.18.1",
+    "geoip-lite": "^1.4.6",
+    "ipaddr.js": "^2.0.1",
+    "moment": "^2.29.4",
+    "orango": "^1.0.0-beta-1.1",
+    "path": "^0.12.7",
+    "request-ip": "^3.3.0"
+  },
+  "devDependencies": {
+    "nodemon": "^2.0.19"
+  }
+}
