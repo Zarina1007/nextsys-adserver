@@ -14,7 +14,7 @@ router.get('/', function (req, res) {
 
 // response search module
 router.get('/search', async function (req, res) {
-  const { q, tid } = req.query;
+  const { q, tid, subid } = req.query;
   const userAgent = req.headers["user-agent"];
   let ipAddress = requestIP.getClientIp(req);
   
