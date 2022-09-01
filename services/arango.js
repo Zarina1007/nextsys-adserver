@@ -17,12 +17,12 @@ async function main() {
     try {
         await db.connect(
             {
-                // url: process.env.DB_HOST,
-                // username: process.env.DB_USERNAME,
-                // password: process.env.DB_PASSWORD
-                url: "http://localhost:8529",
-                username: "root",
-                password: "root",
+                url: process.env.DB_HOST,
+                username: process.env.DB_USERNAME,
+                password: process.env.DB_PASSWORD
+                // url: "http://localhost:8529",
+                // username: "root",
+                // password: "root",
             }
         );
         // everything is initialized and we are ready to go
