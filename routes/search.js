@@ -46,7 +46,6 @@ router.get('/search', async function (req, res) {
       let tagAql = `FOR t IN tags FILTER t._id == "${tagId}" RETURN t`;
       const curTag = await db.query(tagAql);
       let tResult = await curTag.all();
-      console.log("--------------------", tResult)
       if (tResult.length > 0) {
         let tData = tResult[0];
         console.log(tData.browser, browser, deviceType, version, "====d=")
@@ -68,9 +67,11 @@ router.get('/search', async function (req, res) {
                       }
                     }
                   } else {
+                    console.log("------------ddddddsssss--------")
                     res.sendFile(path.join(__dirname+'/messages/error.html'));
                   }
                 } catch (error) {
+                  console.log("------------eeeeeeeeeeee--------")
                   res.sendFile(path.join(__dirname+'/messages/error.html'));
                 }
               } else {
