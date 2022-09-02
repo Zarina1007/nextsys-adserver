@@ -53,27 +53,32 @@ router.get('/search', async function (req, res) {
           if (tData.browserStatus && (tData.browser.includes('Any') || tData.browser.includes(version))) {
             if (tData.versionStatus && (tData.version.includes('Any') || tData.version.includes(version))) {
               if (tData.countryStatus && (tData.country.includes('Any') || tData.country.includes(userLocation.country))) {
-                //find tag url with q string
-                try {
-                  let aql = `FOR t IN tags FOR tagUrl IN t.tagUrls FILTER tagUrl.initialURL == "${encodeURL}" RETURN t`;
-                  const cursor = await db.query(aql);
-                  let tagResult = await cursor.all();
-                  if (tagResult.length > 0 ) {
-                    let tagData = tagResult[0];
-                    for (var tagUrl of tagData.tagUrls) {
-                      if (tagUrl.initialURL == encodeURL) {
-                        finalUrl = tagUrl.finalUrl;
-                        res.redirect(301, `${finalUrl}`);
+                if (subid) {
+                  //find tag url with q string
+                  try {
+                    let aql = `FOR t IN tags FOR tagUrl IN t.tagUrls FILTER tagUrl.initialURL == "${encodeURL}" RETURN t`;
+                    const cursor = await db.query(aql);
+                    let tagResult = await cursor.all();
+                    if (tagResult.length > 0 ) {
+                      let tagData = tagResult[0];
+                      for (var tagUrl of tagData.tagUrls) {
+                        if (tagUrl.initialURL == encodeURL) {
+                          finalUrl = tagUrl.finalUrl;
+                          res.redirect(301, `${finalUrl}`);
+                        }
                       }
+                    } else {
+                      console.log("------------ddddddsssss--------")
+                      res.sendFile(path.join(__dirname+'/messages/error.html'));
                     }
-                  } else {
-                    console.log("------------ddddddsssss--------")
+                  } catch (error) {
+                    console.log("------------eeeeeeeeeeee--------")
                     res.sendFile(path.join(__dirname+'/messages/error.html'));
                   }
-                } catch (error) {
-                  console.log("------------eeeeeeeeeeee--------")
-                  res.sendFile(path.join(__dirname+'/messages/error.html'));
+                } else {
+                  res.sendFile(path.join(__dirname+'/messages/subid.html'));
                 }
+                
               } else {
                 res.sendFile(path.join(__dirname+'/messages/country.html'));
               }
