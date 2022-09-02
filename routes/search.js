@@ -49,8 +49,8 @@ router.get('/search', async function (req, res) {
       if (tResult.length > 0) {
         let tData = tResult[0];
         console.log(tData.browser, browser, deviceType, version, "====d=")
-        if (tData.deviceTypeStatus && (tData.deviceType.includes('Any') || tData.deviceType.includes(browser))) {
-          if (tData.browserStatus && (tData.browser.includes('Any') || tData.browser.includes(version))) {
+        if (tData.deviceTypeStatus && (tData.deviceType.includes('Any') || tData.deviceType.includes(deviceType))) {
+          if (tData.browserStatus && (tData.browser.includes('Any') || tData.browser.includes(browser))) {
             if (tData.versionStatus && (tData.version.includes('Any') || tData.version.includes(version))) {
               if (tData.countryStatus && (tData.country.includes('Any') || tData.country.includes(userLocation.country))) {
                 if (subid) {
