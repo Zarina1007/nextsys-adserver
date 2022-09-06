@@ -37,7 +37,6 @@ router.get('/search', async function (req, res) {
   
   if (q && tid) {
     const domain = process.env.DOMAIN;
-    console.log("-------------ddddd-------", domain)
     const encodeURL = encodeURI(`${domain}/search?q=${q}`);
     let finalUrl = '';
     const tagId = `tags/${tid}`;
@@ -68,11 +67,9 @@ router.get('/search', async function (req, res) {
                         }
                       }
                     } else {
-                      console.log("------------ddddddsssss--------")
                       res.sendFile(path.join(__dirname+'/messages/error.html'));
                     }
                   } catch (error) {
-                    console.log("------------eeeeeeeeeeee--------")
                     res.sendFile(path.join(__dirname+'/messages/error.html'));
                   }
                 } else {
@@ -93,11 +90,9 @@ router.get('/search', async function (req, res) {
           res.sendFile(path.join(__dirname+'/messages/device.html'));
         }
       } else {
-        console.log("-------------edddd-------")
         res.sendFile(path.join(__dirname+'/messages/error.html'));
       }
     } catch (error) {
-      console.log("-------------carrrrrr-------")
       res.sendFile(path.join(__dirname+'/messages/error.html'));
     }
   } else {
