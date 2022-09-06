@@ -48,9 +48,13 @@ router.get('/search', async function (req, res) {
       if (tResult.length > 0) {
         let tData = tResult[0];
         console.log(tData.browser, browser, deviceType, version, "====d=")
+        //device type check
         if (tData.deviceTypeStatus && (tData.deviceType.includes('Any') || tData.deviceType.includes(deviceType))) {
+          //browser check
           if (tData.browserStatus && (tData.browser.includes('Any') || tData.browser.includes(browser))) {
+            //browser version check
             if (tData.versionStatus && (tData.version.includes('Any') || tData.version.includes(version))) {
+              //country check
               if (tData.countryStatus && (tData.country.includes('Any') || tData.country.includes(userLocation.country))) {
                 if (subid) {
                   //find tag url with q string
