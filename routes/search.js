@@ -79,7 +79,7 @@ router.get('/search', async function (req, res) {
                           console.log(current_url, query, "======================")
                           //traffic query add part
                           try {
-                            db.query(`INSERT { query: "${query}", ip: "${ipAddress}" } INTO traffic_queries`);
+                            db.query(`UPSERT { query: "${query}", ip: "${ipAddress}" } INSERT { query: "${query}", ip: "${ipAddress}" } UPDATE { query: "${query}", ip: "${ipAddress}" } IN traffic_queries`);
                           } catch (err) {
                             console.log(err);
                           }
