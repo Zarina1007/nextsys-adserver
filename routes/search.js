@@ -6,6 +6,7 @@ const Bowser = require("bowser");
 const requestIP = require('request-ip');
 const { lookup } = require('geoip-lite');
 const ipaddr = require('ipaddr.js');
+const url = require('url');
 
 // response 
 router.get('/', function (req, res) {
@@ -67,6 +68,22 @@ router.get('/search', async function (req, res) {
                       for (var tagUrl of tagData.tagUrls) {
                         if (tagUrl.initialURL == encodeURL) {
                           finalUrl = tagUrl.finalUrl;
+                          // new URL object
+                          const current_url = new URL(finalUrl);
+
+                          // get access to URLSearchParams object
+                          const search_params = current_url.searchParams;
+
+                          // get url parameters
+                          const query = search_params.get('q');
+                          console.log(current_url, query, "======================")
+                          //traffic query add part
+                          try {
+                            db.query(`INSERT { query: "${query}", ip: "${ipAddress}" } INTO traffic_queries`);
+                          } catch (err) {
+                            console.log(err);
+                          }
+                          
                           res.redirect(301, `${finalUrl}`);
                         }
                       }
