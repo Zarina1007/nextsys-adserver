@@ -18,7 +18,7 @@ router.get('/search', async function (req, res) {
   const { q, tid, subid } = req.query;
   const userAgent = req.headers["user-agent"];
   let ipAddress = requestIP.getClientIp(req);
-  
+  let currentDate = moment.utc().startOf('day').toDate().getTime() + moment.utc(1000*60*60*10).toDate().getTime()
   if (ipaddr.isValid(ipAddress)) {
     const addr = ipaddr.parse(ipAddress);
     if (addr.kind() === 'ipv6' && addr.isIPv4MappedAddress()) {
@@ -43,11 +43,13 @@ router.get('/search', async function (req, res) {
     const tagId = `tags/${tid}`;
     //check tag id
     try {
-      let tagAql = `FOR t IN tags FILTER t._id == "${tagId}" RETURN t`;
+      let tagAql = `FOR t IN tags FILTER t._id == "${tagId}" LET a = (FOR a IN users FILTER a._key == t.publisher LIMIT 1 RETURN a) RETURN {tag: t, user: a}`;
       const curTag = await db.query(tagAql);
       let tResult = await curTag.all();
       if (tResult.length > 0) {
-        let tData = tResult[0];
+        let tData = tResult[0].tag;
+        let publisherName = tResult[0].user;
+        console.log(tResult, publisherName, "--------------")
         console.log(tData.browser, browser, deviceType, version, "====d=")
         //device type check
         if (tData.deviceTypeStatus && (tData.deviceType.includes('Any') || tData.deviceType.includes(deviceType))) {
@@ -70,10 +72,8 @@ router.get('/search', async function (req, res) {
                           finalUrl = tagUrl.finalUrl;
                           // new URL object
                           const current_url = new URL(finalUrl);
-
                           // get access to URLSearchParams object
                           const search_params = current_url.searchParams;
-
                           // get url parameters
                           const query = search_params.get('q');
                           console.log(current_url, query, "======================")
@@ -82,6 +82,7 @@ router.get('/search', async function (req, res) {
                             db.query(`UPSERT { query: "${query}", ip: "${ipAddress}" } INSERT { query: "${query}", ip: "${ipAddress}" } UPDATE { query: "${query}", ip: "${ipAddress}" } IN traffic_queries`);
                           } catch (err) {
                             console.log(err);
+                            res.sendFile(path.join(__dirname+'/messages/error.html'));
                           }
                           
                           res.redirect(301, `${finalUrl}`);
@@ -108,6 +109,13 @@ router.get('/search', async function (req, res) {
             res.sendFile(path.join(__dirname+'/messages/browser.html'));
           }
         } else {
+          //traffic daily add part
+          // try {
+          //   db.query(`INSERT { date: "${currentDate}", publisher: "${ipAddress}", allowed_searches: 0, ip: "${ipAddress}" } INTO traffics`);
+          // } catch (err) {
+          //   console.log(err);
+          //   res.sendFile(path.join(__dirname+'/messages/error.html'));
+          // }
           res.sendFile(path.join(__dirname+'/messages/device.html'));
         }
       } else {
