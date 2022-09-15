@@ -126,7 +126,7 @@ router.get('/search', async function (req, res) {
           res.sendFile(path.join(__dirname+'/messages/device.html'));
         }
       } else {
-        res.sendFile(path.join(__dirname+'/messages/error.html'));
+        res.sendFile(path.join(__dirname+'/messages/tag.html'));
       }
     } catch (error) {
       res.sendFile(path.join(__dirname+'/messages/error.html'));
