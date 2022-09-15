@@ -96,6 +96,7 @@ router.get('/search', async function (req, res) {
                       console.log(err);
                       res.sendFile(path.join(__dirname+'/messages/error.html'));
                     }
+                    console.log("==========dddddddddddddddd============", `${domain}/search?q=${q}`)
                     res.redirect(301, `${domain}/search?q=${q}`);
                     
                     //res.sendFile(path.join(__dirname+'/messages/error.html'));
