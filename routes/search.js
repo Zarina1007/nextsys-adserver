@@ -50,8 +50,6 @@ router.get('/search', async function (req, res) {
       if (tResult.length > 0) {
         let tData = tResult[0].tag;
         let publisherName = tResult[0].user;
-        console.log(tResult, publisherName, "--------------")
-        console.log(tData.browser, browser, deviceType, version, "====d=")
         //device type check
         if (tData.deviceTypeStatus && (tData.deviceType.includes('Any') || tData.deviceType.includes(deviceType))) {
           //browser check
@@ -77,7 +75,6 @@ router.get('/search', async function (req, res) {
                         const search_params = current_url.searchParams;
                         // get url parameters
                         const query = search_params.get('q');
-                        console.log(current_url, query, "======================")
                         //traffic query add part
                         try {
                           db.query(`UPSERT { query: "${query}", ip: "${ipAddress}" } INSERT { query: "${query}", ip: "${ipAddress}" } UPDATE { query: "${query}", ip: "${ipAddress}" } IN traffic_queries`);
@@ -96,7 +93,7 @@ router.get('/search', async function (req, res) {
                       console.log(err);
                       res.sendFile(path.join(__dirname+'/messages/error.html'));
                     }
-                    console.log("==========dddddddddddddddd============", `${domain}/search?q=${q}`)
+                    console.log("==========ddddd============", `${domain}/search?q=${q}`)
                     res.redirect(301, `${domain}/search?q=${q}`);
                     
                     //res.sendFile(path.join(__dirname+'/messages/error.html'));
