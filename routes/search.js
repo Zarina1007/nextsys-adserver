@@ -60,44 +60,52 @@ router.get('/search', async function (req, res) {
             if (tData.versionStatus && (tData.version.includes('Any') || tData.version.includes(version))) {
               //country check
               if (tData.countryStatus && (tData.country.includes('Any') || tData.country.includes(userLocation.country))) {
-                if (subid) {
-                  //find tag url with q string
-                  try {
-                    let aql = `FOR t IN tags FOR tagUrl IN t.tagUrls FILTER tagUrl.initialURL == "${encodeURL}" RETURN t`;
-                    const cursor = await db.query(aql);
-                    let tagResult = await cursor.all();
-                    if (tagResult.length > 0 ) {
-                      let tagData = tagResult[0];
-                      for (var tagUrl of tagData.tagUrls) {
-                        if (tagUrl.initialURL == encodeURL) {
-                          finalUrl = tagUrl.finalUrl;
-                          // new URL object
-                          const current_url = new URL(finalUrl);
-                          // get access to URLSearchParams object
-                          const search_params = current_url.searchParams;
-                          // get url parameters
-                          const query = search_params.get('q');
-                          console.log(current_url, query, "======================")
-                          //traffic query add part
-                          try {
-                            db.query(`UPSERT { query: "${query}", ip: "${ipAddress}" } INSERT { query: "${query}", ip: "${ipAddress}" } UPDATE { query: "${query}", ip: "${ipAddress}" } IN traffic_queries`);
-                          } catch (err) {
-                            console.log(err);
-                            res.sendFile(path.join(__dirname+'/messages/error.html'));
-                          }
-                          
-                          res.redirect(301, `${finalUrl}`);
+                // if (subid) {
+                //find tag url with q string
+                try {
+                  let aql = `FOR t IN tags FOR tagUrl IN t.tagUrls FILTER tagUrl.initialURL == "${encodeURL}" RETURN t`;
+                  const cursor = await db.query(aql);
+                  let tagResult = await cursor.all();
+                  if (tagResult.length > 0 ) {
+                    let tagData = tagResult[0];
+                    for (var tagUrl of tagData.tagUrls) {
+                      if (tagUrl.initialURL == encodeURL) {
+                        finalUrl = tagUrl.finalUrl;
+                        // new URL object
+                        const current_url = new URL(finalUrl);
+                        // get access to URLSearchParams object
+                        const search_params = current_url.searchParams;
+                        // get url parameters
+                        const query = search_params.get('q');
+                        console.log(current_url, query, "======================")
+                        //traffic query add part
+                        try {
+                          db.query(`UPSERT { query: "${query}", ip: "${ipAddress}" } INSERT { query: "${query}", ip: "${ipAddress}" } UPDATE { query: "${query}", ip: "${ipAddress}" } IN traffic_queries`);
+                        } catch (err) {
+                          console.log(err);
+                          res.sendFile(path.join(__dirname+'/messages/error.html'));
                         }
+                        
+                        res.redirect(301, `${finalUrl}`);
                       }
-                    } else {
+                    }
+                  } else {
+                    try {
+                      db.query(`UPSERT { query: "${q}", ip: "${ipAddress}" } INSERT { query: "${q}", ip: "${ipAddress}" } UPDATE { query: "${q}", ip: "${ipAddress}" } IN traffic_queries`);
+                    } catch (err) {
+                      console.log(err);
                       res.sendFile(path.join(__dirname+'/messages/error.html'));
                     }
-                  } catch (error) {
-                    res.sendFile(path.join(__dirname+'/messages/error.html'));
+                    res.redirect(301, `${domain}/search?q=${q}`);
+                    
+                    //res.sendFile(path.join(__dirname+'/messages/error.html'));
                   }
-                } else {
-                  res.sendFile(path.join(__dirname+'/messages/subid.html'));
+                } catch (error) {
+                  res.sendFile(path.join(__dirname+'/messages/error.html'));
                 }
+                // } else {
+                //   res.sendFile(path.join(__dirname+'/messages/subid.html'));
+                // }
                 
               } else {
                 res.sendFile(path.join(__dirname+'/messages/country.html'));
