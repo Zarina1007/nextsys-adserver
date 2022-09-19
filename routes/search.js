@@ -8,11 +8,24 @@ const { lookup } = require('geoip-lite');
 const ipaddr = require('ipaddr.js');
 const url = require('url');
 var moment = require('moment');
+var { collectDefaultMetrics, register } = require('prom-client');
+collectDefaultMetrics();
 
 // response 
 router.get('/', function (req, res) {
   res.sendFile(path.join(__dirname+'/messages/state.html'));
 });
+
+//grafana
+router.get('/metrics', async (_req, res) => {
+  try {
+    res.set('Content-Type', register.contentType);
+    res.end(await register.metrics());
+  } catch (err) {
+    res.status(500).end(err);
+  }
+});
+
 
 // response search module
 router.get('/search', async function (req, res) {
