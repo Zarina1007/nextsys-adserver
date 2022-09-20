@@ -8,8 +8,18 @@ const { lookup } = require('geoip-lite');
 const ipaddr = require('ipaddr.js');
 const url = require('url');
 var moment = require('moment');
-var { collectDefaultMetrics, register } = require('prom-client');
-collectDefaultMetrics();
+const client = require('prom-client');
+
+// Create a Registry which registers the metrics
+const register = new client.Registry();
+
+// Add a default label which is added to all metrics
+register.setDefaultLabels({
+  app: 'extsys-adserver'
+})
+
+// Enable the collection of default metrics
+client.collectDefaultMetrics({ register })
 
 // response 
 router.get('/', function (req, res) {
@@ -19,8 +29,10 @@ router.get('/', function (req, res) {
 //grafana
 router.get('/metrics', async (_req, res) => {
   try {
+    // Return all metrics the Prometheus exposition format
     res.set('Content-Type', register.contentType);
-    res.end(await register.metrics());
+    let metrics = await register.metrics();
+    res.send(metrics);
   } catch (err) {
     res.status(500).end(err);
   }
