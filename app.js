@@ -18,7 +18,7 @@ app.use(logger('dev'));
 app.use(express.json());
 
 // parse urlencoded request body
-app.use(express.urlencoded({ extended: false }));
+// app.use(express.urlencoded({ extended: false }));
 
 app.use(express.static('public'));
 // CORS is enabled for all origins
