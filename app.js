@@ -11,7 +11,7 @@ var searchRouter = require('./routes/search');
 const app = express();
 
 // set security HTTP headers
-app.use(helmet()); // https://expressjs.com/en/advanced/best-practice-security.html#use-helmet
+//app.use(helmet()); // https://expressjs.com/en/advanced/best-practice-security.html#use-helmet
 
 app.use(logger('dev'));
 
