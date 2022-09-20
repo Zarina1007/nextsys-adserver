@@ -15,7 +15,7 @@ const register = new client.Registry();
 
 // Add a default label which is added to all metrics
 register.setDefaultLabels({
-  app: 'extsys-adserver'
+  app: 'nextsys-adserver'
 })
 
 // Enable the collection of default metrics
