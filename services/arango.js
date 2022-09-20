@@ -30,7 +30,6 @@ async function main() {
         //db.createCollection("actors")
 
     } catch (e) {
-        console.log(e)
         console.log('Error:', e.message)
     }
 }

@@ -32,7 +32,7 @@ router.get('/metrics', async (_req, res) => {
     // Return all metrics the Prometheus exposition format
     res.set('Content-Type', register.contentType);
     let metrics = await register.metrics();
-    res.send(metrics);
+    res.end(metrics);
   } catch (err) {
     res.status(500).end(err);
   }
