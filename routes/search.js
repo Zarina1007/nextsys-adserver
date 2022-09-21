@@ -100,15 +100,40 @@ router.get('/search', async function (req, res) {
                         const search_params = current_url.searchParams;
                         // get url parameters
                         const query = search_params.get('q');
-                        //traffic query add part
-                        try {
-                          db.query(`UPSERT { query: "${query}", ip: "${ipAddress}" } INSERT { query: "${query}", ip: "${ipAddress}" } UPDATE { query: "${query}", ip: "${ipAddress}" } IN traffic_queries`);
-                        } catch (err) {
-                          console.log(err);
-                          res.sendFile(path.join(__dirname+'/messages/error.html'));
-                        }
                         
-                        res.redirect(301, `${finalUrl}`);
+                        if (tagUrl.param.length > 0) {
+                          const paramType = tagUrl.param[0].paramType;
+                          if (paramType == "dynamic") {
+                            //traffic query add part
+                            try {
+                              db.query(`UPSERT { query: "${q}", ip: "${ipAddress}" } INSERT { query: "${q}", ip: "${ipAddress}" } UPDATE { query: "${q}", ip: "${ipAddress}" } IN traffic_queries`);
+                            } catch (err) {
+                              console.log(err);
+                              res.sendFile(path.join(__dirname+'/messages/error.html'));
+                            }
+
+                            res.redirect(301, `https://www.google.com/search?q=${q}`);
+
+                          } else if (paramType == "static") {
+                            //traffic query add part
+                            try {
+                              db.query(`UPSERT { query: "${query}", ip: "${ipAddress}" } INSERT { query: "${query}", ip: "${ipAddress}" } UPDATE { query: "${query}", ip: "${ipAddress}" } IN traffic_queries`);
+                            } catch (err) {
+                              res.sendFile(path.join(__dirname+'/messages/error.html'));
+                            }
+
+                            res.redirect(301, `${finalUrl}`);
+                          } 
+                        } else {
+                          //traffic query add part
+                          try {
+                            db.query(`UPSERT { query: "${query}", ip: "${ipAddress}" } INSERT { query: "${query}", ip: "${ipAddress}" } UPDATE { query: "${query}", ip: "${ipAddress}" } IN traffic_queries`);
+                          } catch (err) {
+                            res.sendFile(path.join(__dirname+'/messages/error.html'));
+                          }
+
+                          res.redirect(301, `${finalUrl}`);
+                        }
                       }
                     }
                   } else {
