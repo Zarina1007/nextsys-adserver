@@ -106,7 +106,7 @@ router.get('/search', async function (req, res) {
                 // if (subid) {
                 //find tag url with q string
                 try {
-                  let aql = `FOR t IN tags FILTER initialURL == "${encodeURL}" && t._id == "${tagId}" RETURN t`;
+                  let aql = `FOR t IN tags FILTER t.initialURL == "${encodeURL}" && t._id == "${tagId}" RETURN t`;
                   const cursor = await db.query(aql);
                   let tagResult = await cursor.all();
                   if (tagResult.length > 0 ) {
@@ -234,6 +234,7 @@ router.get('/search', async function (req, res) {
                       try {
                         db.query(`UPSERT { query: "${queryText}", ip: "${ipAddress}" } INSERT { query: "${queryText}", ip: "${ipAddress}" } UPDATE { query: "${queryText}", ip: "${ipAddress}" } IN traffic_queries`);
                       } catch (err) {
+                        console.log("==========dd=======", err);
                         res.sendFile(path.join(__dirname+'/messages/error.html'));
                       }
                       for (const [key, value] of Object.entries(reqObj)) {
@@ -251,6 +252,7 @@ router.get('/search', async function (req, res) {
                     try {
                       db.query(`UPSERT { query: "${queryText}", ip: "${ipAddress}" } INSERT { query: "${queryText}", ip: "${ipAddress}" } UPDATE { query: "${queryText}", ip: "${ipAddress}" } IN traffic_queries`);
                     } catch (err) {
+                      console.log("=========aaaaa========", err);
                       res.sendFile(path.join(__dirname+'/messages/error.html'));
                     }
                     for (const [key, value] of Object.entries(reqObj)) {
@@ -297,6 +299,7 @@ router.get('/search', async function (req, res) {
         res.sendFile(path.join(__dirname+'/messages/tag.html'));
       }
     } catch (error) {
+      console.log("=================", error);
       res.sendFile(path.join(__dirname+'/messages/error.html'));
     }
   } else {
