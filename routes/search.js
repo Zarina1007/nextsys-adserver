@@ -79,7 +79,8 @@ router.get('/search', async function (req, res) {
   let version = browserData.getBrowserVersion();
   
   if (tid) {
-    const encodeURL = encodeURI(domainSearchUrl.href);
+    const encodeURL = domainSearchUrl.href;
+    // const encodeURL = encodeURI(domainSearchUrl.href);
     console.log(decodeURI(domainSearchUrl.href), domainSearchUrl.href,encodeURL, getState().probability, "-------------")
     setState({
       probability: !getState().probability
