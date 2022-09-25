@@ -81,11 +81,9 @@ router.get('/search', async function (req, res) {
   if (tid) {
     const encodeURL = domainSearchUrl.href;
     // const encodeURL = encodeURI(domainSearchUrl.href);
-    console.log(decodeURI(domainSearchUrl.href), domainSearchUrl.href,encodeURL, getState().probability, "-------------")
     setState({
       probability: !getState().probability
     });
-    console.log(getState().probability, "-------dd------")
     let finalUrl = '';
     const tagId = `tags/${tid}`;
     //check tag id
@@ -110,12 +108,12 @@ router.get('/search', async function (req, res) {
                   let aql = `FOR t IN tags FILTER t.initialURL == "${encodeURL}" && t._id == "${tagId}" RETURN t`;
                   const cursor = await db.query(aql);
                   let tagResult = await cursor.all();
-                  console.log(tagResult, "000000000000000000000000000")
                   if (tagResult.length > 0 ) {
                     let tagData = tagResult[0];
                     if (tagData.tagUrls.length > 0) {
                       if (tagData.tagUrls.length > 1) {
                         if (getState().probability) {
+                          console.log("true")
                           finalUrl = tagData.tagUrls[1].finalUrl;
                           // new URL object
                           const current_url = new URL(finalUrl);
@@ -154,6 +152,7 @@ router.get('/search', async function (req, res) {
                             } 
                           }
                         } else {
+                          console.log("false")
                           finalUrl = tagData.tagUrls[0].finalUrl;
                           // new URL object
                           const current_url = new URL(finalUrl);

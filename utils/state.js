@@ -2,7 +2,7 @@ let state = {
     currentAllowedTraffic: 0,
     currentTotalTraffic: 0,
     currentRejectedTraffic: 0,
-    probability: false,
+    probability: true,
 };
 
 const getState = () => state;
