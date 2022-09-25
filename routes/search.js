@@ -9,6 +9,7 @@ const ipaddr = require('ipaddr.js');
 const url = require('url');
 var moment = require('moment');
 const client = require('prom-client');
+var { getState, setState } = require("../utils/state");
 
 // Create a Registry which registers the metrics
 const register = new client.Registry();
@@ -41,7 +42,22 @@ router.get('/metrics', async (_req, res) => {
 
 // response search module
 router.get('/search', async function (req, res) {
-  const { q, tid, subid } = req.query;
+  const reqObj = req.query;
+  const domain = process.env.DOMAIN;
+  var googleRedirectUrl = new URL('https://www.google.com/search');
+  var domainSearchUrl = new URL(`${domain}/search`);
+  var queryList = [];
+  for (const [key, value] of Object.entries(reqObj)) {
+    if (key !== "tid") {
+      queryList.push(value);
+      domainSearchUrl.searchParams.append(
+        key,
+        value
+      )
+    }
+  }
+  var queryText = queryList.join(' + ');
+  const { tid } = req.query;
   const userAgent = req.headers["user-agent"];
   let ipAddress = requestIP.getClientIp(req);
   let currentDate = moment.utc().startOf('day').toDate().getTime() + moment.utc(1000*60*60*10).toDate().getTime()
@@ -62,9 +78,13 @@ router.get('/search', async function (req, res) {
   let deviceType = browserData.getPlatform().type;
   let version = browserData.getBrowserVersion();
   
-  if (q && tid) {
-    const domain = process.env.DOMAIN;
-    const encodeURL = encodeURI(`${domain}/search?q=${q}`);
+  if (tid) {
+    const encodeURL = encodeURI(domainSearchUrl.href);
+    console.log(decodeURI(domainSearchUrl.href), getState().probability, "-------------")
+    setState({
+      probability: !getState().probability
+    });
+    console.log(getState().probability, "-------dd------")
     let finalUrl = '';
     const tagId = `tags/${tid}`;
     //check tag id
@@ -86,65 +106,163 @@ router.get('/search', async function (req, res) {
                 // if (subid) {
                 //find tag url with q string
                 try {
-                  let aql = `FOR t IN tags FOR tagUrl IN t.tagUrls FILTER tagUrl.initialURL == "${encodeURL}" RETURN t`;
+                  let aql = `FOR t IN tags FILTER initialURL == "${encodeURL}" && t._id == "${tagId}" RETURN t`;
                   const cursor = await db.query(aql);
                   let tagResult = await cursor.all();
                   if (tagResult.length > 0 ) {
                     let tagData = tagResult[0];
-                    for (var tagUrl of tagData.tagUrls) {
-                      if (tagUrl.initialURL == encodeURL) {
-                        finalUrl = tagUrl.finalUrl;
+                    if (tagData.tagUrls.length > 0) {
+                      if (tagData.tagUrls.length > 1) {
+                        if (getState().probability) {
+                          finalUrl = tagData.tagUrls[1].finalUrl;
+                          // new URL object
+                          const current_url = new URL(finalUrl);
+                          // get access to URLSearchParams object
+                          const search_params = current_url.searchParams;
+                          // get url parameters
+                          var query = "";
+                          for (const [key, value] of Object.entries(search_params)) {
+                            if (key !== "tid") {
+                              query = value;
+                            }
+                          }
+                          
+                          if (tagData.tagUrls[1].param.length > 0) {
+                            const paramType = tagData.tagUrls[1].param[0].paramType;
+                            if (paramType == "dynamic") {
+                              //traffic query add part
+                              try {
+                                db.query(`UPSERT { query: "${query}", ip: "${ipAddress}" } INSERT { query: "${query}", ip: "${ipAddress}" } UPDATE { query: "${query}", ip: "${ipAddress}" } IN traffic_queries`);
+                              } catch (err) {
+                                console.log(err);
+                                res.sendFile(path.join(__dirname+'/messages/error.html'));
+                              }
+
+                              res.redirect(301, `${finalUrl}`);
+
+                            } else if (paramType == "static") {
+                              //traffic query add part
+                              try {
+                                db.query(`UPSERT { query: "${queryText}", ip: "${ipAddress}" } INSERT { query: "${queryText}", ip: "${ipAddress}" } UPDATE { query: "${queryText}", ip: "${ipAddress}" } IN traffic_queries`);
+                              } catch (err) {
+                                res.sendFile(path.join(__dirname+'/messages/error.html'));
+                              }
+
+                              res.redirect(301, `${finalUrl}`);
+                            } 
+                          }
+                        } else {
+                          finalUrl = tagData.tagUrls[0].finalUrl;
+                          // new URL object
+                          const current_url = new URL(finalUrl);
+                          // get access to URLSearchParams object
+                          const search_params = current_url.searchParams;
+                          // get url parameters
+                          var query = "";
+                          for (const [key, value] of Object.entries(search_params)) {
+                            if (key !== "tid") {
+                              query = value;
+                            }
+                          }
+                          
+                          if (tagData.tagUrls[0].param.length > 0) {
+                            const paramType = tagData.tagUrls[0].param[0].paramType;
+                            if (paramType == "dynamic") {
+                              //traffic query add part
+                              try {
+                                db.query(`UPSERT { query: "${query}", ip: "${ipAddress}" } INSERT { query: "${query}", ip: "${ipAddress}" } UPDATE { query: "${query}", ip: "${ipAddress}" } IN traffic_queries`);
+                              } catch (err) {
+                                console.log(err);
+                                res.sendFile(path.join(__dirname+'/messages/error.html'));
+                              }
+
+                              res.redirect(301, `${finalUrl}`);
+
+                            } else if (paramType == "static") {
+                              //traffic query add part
+                              try {
+                                db.query(`UPSERT { query: "${queryText}", ip: "${ipAddress}" } INSERT { query: "${queryText}", ip: "${ipAddress}" } UPDATE { query: "${queryText}", ip: "${ipAddress}" } IN traffic_queries`);
+                              } catch (err) {
+                                res.sendFile(path.join(__dirname+'/messages/error.html'));
+                              }
+
+                              res.redirect(301, `${finalUrl}`);
+                            } 
+                          }
+                        }
+                      } else {
+                        finalUrl = tagData.tagUrls[0].finalUrl;
                         // new URL object
                         const current_url = new URL(finalUrl);
                         // get access to URLSearchParams object
                         const search_params = current_url.searchParams;
                         // get url parameters
-                        const query = search_params.get('q');
+                        var query = "";
+                        for (const [key, value] of Object.entries(search_params)) {
+                          if (key !== "tid") {
+                            query = value;
+                          }
+                        }
                         
-                        if (tagUrl.param.length > 0) {
-                          const paramType = tagUrl.param[0].paramType;
+                        if (tagData.tagUrls[0].param.length > 0) {
+                          const paramType = tagData.tagUrls[0].param[0].paramType;
                           if (paramType == "dynamic") {
                             //traffic query add part
                             try {
-                              db.query(`UPSERT { query: "${q}", ip: "${ipAddress}" } INSERT { query: "${q}", ip: "${ipAddress}" } UPDATE { query: "${q}", ip: "${ipAddress}" } IN traffic_queries`);
+                              db.query(`UPSERT { query: "${query}", ip: "${ipAddress}" } INSERT { query: "${query}", ip: "${ipAddress}" } UPDATE { query: "${query}", ip: "${ipAddress}" } IN traffic_queries`);
                             } catch (err) {
                               console.log(err);
                               res.sendFile(path.join(__dirname+'/messages/error.html'));
                             }
 
-                            res.redirect(301, `https://www.google.com/search?q=${q}`);
+                            res.redirect(301, `${finalUrl}`);
 
                           } else if (paramType == "static") {
                             //traffic query add part
                             try {
-                              db.query(`UPSERT { query: "${query}", ip: "${ipAddress}" } INSERT { query: "${query}", ip: "${ipAddress}" } UPDATE { query: "${query}", ip: "${ipAddress}" } IN traffic_queries`);
+                              db.query(`UPSERT { query: "${queryText}", ip: "${ipAddress}" } INSERT { query: "${queryText}", ip: "${ipAddress}" } UPDATE { query: "${queryText}", ip: "${ipAddress}" } IN traffic_queries`);
                             } catch (err) {
                               res.sendFile(path.join(__dirname+'/messages/error.html'));
                             }
 
                             res.redirect(301, `${finalUrl}`);
                           } 
-                        } else {
-                          //traffic query add part
-                          try {
-                            db.query(`UPSERT { query: "${query}", ip: "${ipAddress}" } INSERT { query: "${query}", ip: "${ipAddress}" } UPDATE { query: "${query}", ip: "${ipAddress}" } IN traffic_queries`);
-                          } catch (err) {
-                            res.sendFile(path.join(__dirname+'/messages/error.html'));
-                          }
-
-                          res.redirect(301, `${finalUrl}`);
                         }
                       }
+                      
+                    } else {
+                      try {
+                        db.query(`UPSERT { query: "${queryText}", ip: "${ipAddress}" } INSERT { query: "${queryText}", ip: "${ipAddress}" } UPDATE { query: "${queryText}", ip: "${ipAddress}" } IN traffic_queries`);
+                      } catch (err) {
+                        res.sendFile(path.join(__dirname+'/messages/error.html'));
+                      }
+                      for (const [key, value] of Object.entries(reqObj)) {
+                        if (key !== "tid") {
+                          googleRedirectUrl.searchParams.append(
+                            key,
+                            value
+                          )
+                        }
+                      }
+                      console.log("==========first============", googleRedirectUrl.href)
+                      res.redirect(301, googleRedirectUrl.href);
                     }
                   } else {
                     try {
-                      db.query(`UPSERT { query: "${q}", ip: "${ipAddress}" } INSERT { query: "${q}", ip: "${ipAddress}" } UPDATE { query: "${q}", ip: "${ipAddress}" } IN traffic_queries`);
+                      db.query(`UPSERT { query: "${queryText}", ip: "${ipAddress}" } INSERT { query: "${queryText}", ip: "${ipAddress}" } UPDATE { query: "${queryText}", ip: "${ipAddress}" } IN traffic_queries`);
                     } catch (err) {
-                      console.log(err);
                       res.sendFile(path.join(__dirname+'/messages/error.html'));
                     }
-                    console.log("==========ddddd============", `https://www.google.com/search?q=${q}`)
-                    res.redirect(301, `https://www.google.com/search?q=${q}`);
+                    for (const [key, value] of Object.entries(reqObj)) {
+                      if (key !== "tid") {
+                        googleRedirectUrl.searchParams.append(
+                          key,
+                          value
+                        )
+                      }
+                    }
+                    console.log("==========after============", googleRedirectUrl.href)
+                    res.redirect(301, googleRedirectUrl.href);
                     
                     //res.sendFile(path.join(__dirname+'/messages/error.html'));
                   }
@@ -182,7 +300,7 @@ router.get('/search', async function (req, res) {
       res.sendFile(path.join(__dirname+'/messages/error.html'));
     }
   } else {
-    res.redirect(301, `https://google.com/search`);
+    res.redirect(301, googleRedirectUrl.href);
   }
   
 });
