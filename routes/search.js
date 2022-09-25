@@ -80,7 +80,7 @@ router.get('/search', async function (req, res) {
   
   if (tid) {
     const encodeURL = encodeURI(domainSearchUrl.href);
-    console.log(decodeURI(domainSearchUrl.href), getState().probability, "-------------")
+    console.log(decodeURI(domainSearchUrl.href),encodeURL, getState().probability, "-------------")
     setState({
       probability: !getState().probability
     });
@@ -109,6 +109,7 @@ router.get('/search', async function (req, res) {
                   let aql = `FOR t IN tags FILTER t.initialURL == "${encodeURL}" && t._id == "${tagId}" RETURN t`;
                   const cursor = await db.query(aql);
                   let tagResult = await cursor.all();
+                  console.log(tagResult, "000000000000000000000000000")
                   if (tagResult.length > 0 ) {
                     let tagData = tagResult[0];
                     if (tagData.tagUrls.length > 0) {
