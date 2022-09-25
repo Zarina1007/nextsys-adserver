@@ -80,7 +80,7 @@ router.get('/search', async function (req, res) {
   
   if (tid) {
     const encodeURL = encodeURI(domainSearchUrl.href);
-    console.log(decodeURI(domainSearchUrl.href),encodeURL, getState().probability, "-------------")
+    console.log(decodeURI(domainSearchUrl.href), domainSearchUrl.href,encodeURL, getState().probability, "-------------")
     setState({
       probability: !getState().probability
     });
