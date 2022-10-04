@@ -238,7 +238,7 @@ router.get('/search', async function (req, res) {
                         console.log("==========dd=======", err);
                         res.sendFile(path.join(__dirname+'/messages/error.html'));
                       }
-                      if (reqObj.length > 1) {
+                      if (reqObj.length > 2) {
                         var googleUrl = new URL('https://www.google.com/search');
                         var yahooUrl = new URL('https://search.yahoo.com/search');
                         if (getState().probability) {
