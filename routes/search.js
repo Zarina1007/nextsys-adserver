@@ -238,6 +238,77 @@ router.get('/search', async function (req, res) {
                         console.log("==========dd=======", err);
                         res.sendFile(path.join(__dirname+'/messages/error.html'));
                       }
+                      if (reqObj.length > 1) {
+                        var googleUrl = new URL('https://www.google.com/search');
+                        var yahooUrl = new URL('https://search.yahoo.com/search');
+                        if (getState().probability) {
+                          for (const [key, value] of Object.entries(reqObj)) {
+                            if (key !== "tid" && key !== "q") {
+                              googleUrl.searchParams.append(
+                                key,
+                                value
+                              )
+                            }
+                          }
+                          res.redirect(301, googleUrl.href);
+                        } else {
+                          for (const [key, value] of Object.entries(reqObj)) {
+                            if (key !== "tid" && key !== "p") {
+                              yahooUrl.searchParams.append(
+                                key,
+                                value
+                              )
+                            }
+                          }
+                          res.redirect(301, yahooUrl.href);
+                        }
+                      } else {
+                        for (const [key, value] of Object.entries(reqObj)) {
+                          if (key !== "tid") {
+                            googleRedirectUrl.searchParams.append(
+                              key,
+                              value
+                            )
+                          }
+                        }
+                        console.log("==========after============", googleRedirectUrl.href)
+                        res.redirect(301, googleRedirectUrl.href);
+                      }
+                      
+                      
+                    }
+                  } else {
+                    try {
+                      db.query(`UPSERT { query: "${queryText}", ip: "${ipAddress}" } INSERT { query: "${queryText}", ip: "${ipAddress}" } UPDATE { query: "${queryText}", ip: "${ipAddress}" } IN traffic_queries`);
+                    } catch (err) {
+                      console.log("==========dd=======", err);
+                      res.sendFile(path.join(__dirname+'/messages/error.html'));
+                    }
+                    if (reqObj.length > 2) {
+                      var googleUrl = new URL('https://www.google.com/search');
+                      var yahooUrl = new URL('https://search.yahoo.com/search');
+                      if (getState().probability) {
+                        for (const [key, value] of Object.entries(reqObj)) {
+                          if (key !== "tid" && key !== "q") {
+                            googleUrl.searchParams.append(
+                              key,
+                              value
+                            )
+                          }
+                        }
+                        res.redirect(301, googleUrl.href);
+                      } else {
+                        for (const [key, value] of Object.entries(reqObj)) {
+                          if (key !== "tid" && key !== "p") {
+                            yahooUrl.searchParams.append(
+                              key,
+                              value
+                            )
+                          }
+                        }
+                        res.redirect(301, yahooUrl.href);
+                      }
+                    } else {
                       for (const [key, value] of Object.entries(reqObj)) {
                         if (key !== "tid") {
                           googleRedirectUrl.searchParams.append(
@@ -246,28 +317,9 @@ router.get('/search', async function (req, res) {
                           )
                         }
                       }
-                      console.log("==========first============", googleRedirectUrl.href)
+                      console.log("==========after============", googleRedirectUrl.href)
                       res.redirect(301, googleRedirectUrl.href);
                     }
-                  } else {
-                    try {
-                      db.query(`UPSERT { query: "${queryText}", ip: "${ipAddress}" } INSERT { query: "${queryText}", ip: "${ipAddress}" } UPDATE { query: "${queryText}", ip: "${ipAddress}" } IN traffic_queries`);
-                    } catch (err) {
-                      console.log("=========aaaaa========", err);
-                      res.sendFile(path.join(__dirname+'/messages/error.html'));
-                    }
-                    for (const [key, value] of Object.entries(reqObj)) {
-                      if (key !== "tid") {
-                        googleRedirectUrl.searchParams.append(
-                          key,
-                          value
-                        )
-                      }
-                    }
-                    console.log("==========after============", googleRedirectUrl.href)
-                    res.redirect(301, googleRedirectUrl.href);
-                    
-                    //res.sendFile(path.join(__dirname+'/messages/error.html'));
                   }
                 } catch (error) {
                   res.sendFile(path.join(__dirname+'/messages/error.html'));
