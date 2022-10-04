@@ -235,7 +235,6 @@ router.get('/search', async function (req, res) {
                       try {
                         db.query(`UPSERT { query: "${queryText}", ip: "${ipAddress}" } INSERT { query: "${queryText}", ip: "${ipAddress}" } UPDATE { query: "${queryText}", ip: "${ipAddress}" } IN traffic_queries`);
                       } catch (err) {
-                        console.log("==========dd=======", err);
                         res.sendFile(path.join(__dirname+'/messages/error.html'));
                       }
                       if (reqObj.length > 2) {
@@ -243,7 +242,7 @@ router.get('/search', async function (req, res) {
                         var yahooUrl = new URL('https://search.yahoo.com/search');
                         if (getState().probability) {
                           for (const [key, value] of Object.entries(reqObj)) {
-                            if (key !== "tid" && key !== "q") {
+                            if (key !== "tid" && key !== "p") {
                               googleUrl.searchParams.append(
                                 key,
                                 value
@@ -253,7 +252,7 @@ router.get('/search', async function (req, res) {
                           res.redirect(301, googleUrl.href);
                         } else {
                           for (const [key, value] of Object.entries(reqObj)) {
-                            if (key !== "tid" && key !== "p") {
+                            if (key !== "tid" && key !== "q") {
                               yahooUrl.searchParams.append(
                                 key,
                                 value
@@ -281,25 +280,27 @@ router.get('/search', async function (req, res) {
                     try {
                       db.query(`UPSERT { query: "${queryText}", ip: "${ipAddress}" } INSERT { query: "${queryText}", ip: "${ipAddress}" } UPDATE { query: "${queryText}", ip: "${ipAddress}" } IN traffic_queries`);
                     } catch (err) {
-                      console.log("==========dd=======", err);
                       res.sendFile(path.join(__dirname+'/messages/error.html'));
                     }
                     if (reqObj.length > 2) {
+                      console.log("==========input=======");
                       var googleUrl = new URL('https://www.google.com/search');
                       var yahooUrl = new URL('https://search.yahoo.com/search');
                       if (getState().probability) {
                         for (const [key, value] of Object.entries(reqObj)) {
-                          if (key !== "tid" && key !== "q") {
+                          if (key !== "tid" && key !== "p") {
                             googleUrl.searchParams.append(
                               key,
                               value
                             )
                           }
                         }
+                        console.log("==========google=======", getState().probability);
                         res.redirect(301, googleUrl.href);
                       } else {
+                        console.log("==========yahoo=======", getState().probability);
                         for (const [key, value] of Object.entries(reqObj)) {
-                          if (key !== "tid" && key !== "p") {
+                          if (key !== "tid" && key !== "q") {
                             yahooUrl.searchParams.append(
                               key,
                               value
