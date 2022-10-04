@@ -56,7 +56,7 @@ router.get('/search', async function (req, res) {
       )
     }
   }
-  console.log("==============ddddddddddddddd",reqObj.length)
+  
   var queryText = queryList.join(' + ');
   const { tid } = req.query;
   const userAgent = req.headers["user-agent"];
@@ -78,7 +78,14 @@ router.get('/search', async function (req, res) {
   let browser = browserData.getBrowser().name;
   let deviceType = browserData.getPlatform().type;
   let version = browserData.getBrowserVersion();
-  
+  var paramObj = [];
+  for (const [key, value] of Object.entries(reqObj)) {
+    if (key !== "tid") {
+      paramObj.push({
+        key: value
+      })
+    }
+  }
   if (tid) {
     const encodeURL = domainSearchUrl.href;
     // const encodeURL = encodeURI(domainSearchUrl.href);
@@ -239,7 +246,7 @@ router.get('/search', async function (req, res) {
                         res.sendFile(path.join(__dirname+'/messages/error.html'));
                       }
                       
-                      if (reqObj.length > 2) {
+                      if (paramObj.length > 1) {
                         var googleUrl = new URL('https://www.google.com/search');
                         var yahooUrl = new URL('https://search.yahoo.com/search');
                         if (getState().probability) {
@@ -272,7 +279,6 @@ router.get('/search', async function (req, res) {
                             )
                           }
                         }
-                        console.log("==========after============", googleRedirectUrl.href)
                         res.redirect(301, googleRedirectUrl.href);
                       }
                       
@@ -284,8 +290,7 @@ router.get('/search', async function (req, res) {
                     } catch (err) {
                       res.sendFile(path.join(__dirname+'/messages/error.html'));
                     }
-                    if (reqObj.length > 2) {
-                      console.log("==========input=======");
+                    if (paramObj.length > 1) {
                       var googleUrl = new URL('https://www.google.com/search');
                       var yahooUrl = new URL('https://search.yahoo.com/search');
                       if (getState().probability) {
