@@ -6,7 +6,6 @@ const Bowser = require("bowser");
 const requestIP = require('request-ip');
 const { lookup } = require('geoip-lite');
 const ipaddr = require('ipaddr.js');
-const url = require('url');
 var moment = require('moment');
 const client = require('prom-client');
 var { getState, setState } = require("../utils/state");
@@ -68,9 +67,9 @@ router.get('/search', async function (req, res) {
       ipAddress = addr.toIPv4Address().toString();
     }
   }
-  console.log(ipAddress)
+  // console.log(ipAddress)
   let userLocation = lookup(ipAddress);
-  console.log(userLocation);
+  // console.log(userLocation);
   if (!userAgent) {
     res.sendFile(path.join(__dirname+'/messages/error.html'));
   }
@@ -121,7 +120,7 @@ router.get('/search', async function (req, res) {
                     if (tagData.tagUrls.length > 0) {
                       if (tagData.tagUrls.length > 1) {
                         if (getState().probability) {
-                          console.log("true")
+                          // console.log("true")
                           finalUrl = tagData.tagUrls[1].finalUrl;
                           // new URL object
                           const current_url = new URL(finalUrl);
@@ -142,7 +141,6 @@ router.get('/search', async function (req, res) {
                               try {
                                 db.query(`UPSERT { query: "${query}", ip: "${ipAddress}" } INSERT { query: "${query}", ip: "${ipAddress}" } UPDATE { query: "${query}", ip: "${ipAddress}" } IN traffic_queries`);
                               } catch (err) {
-                                console.log(err);
                                 res.sendFile(path.join(__dirname+'/messages/error.html'));
                               }
 
@@ -160,7 +158,7 @@ router.get('/search', async function (req, res) {
                             } 
                           }
                         } else {
-                          console.log("false")
+                          // console.log("false")
                           finalUrl = tagData.tagUrls[0].finalUrl;
                           // new URL object
                           const current_url = new URL(finalUrl);
@@ -181,7 +179,6 @@ router.get('/search', async function (req, res) {
                               try {
                                 db.query(`UPSERT { query: "${query}", ip: "${ipAddress}" } INSERT { query: "${query}", ip: "${ipAddress}" } UPDATE { query: "${query}", ip: "${ipAddress}" } IN traffic_queries`);
                               } catch (err) {
-                                console.log(err);
                                 res.sendFile(path.join(__dirname+'/messages/error.html'));
                               }
 
@@ -220,7 +217,6 @@ router.get('/search', async function (req, res) {
                             try {
                               db.query(`UPSERT { query: "${query}", ip: "${ipAddress}" } INSERT { query: "${query}", ip: "${ipAddress}" } UPDATE { query: "${query}", ip: "${ipAddress}" } IN traffic_queries`);
                             } catch (err) {
-                              console.log(err);
                               res.sendFile(path.join(__dirname+'/messages/error.html'));
                             }
 
@@ -271,15 +267,24 @@ router.get('/search', async function (req, res) {
                           res.redirect(yahooUrl.href);
                         }
                       } else {
+                        var googleUrl = new URL('https://www.google.com/search');
+                        var yahooUrl = new URL('https://search.yahoo.com/search');
                         for (const [key, value] of Object.entries(reqObj)) {
-                          if (key !== "tid") {
-                            googleRedirectUrl.searchParams.append(
+                          if (key !== "tid" && key !== "p") {
+                            googleUrl.searchParams.append(
                               key,
                               value
                             )
+                            res.redirect(googleUrl.href);
+                          }
+                          if (key !== "tid" && key !== "q") {
+                            yahooUrl.searchParams.append(
+                              key,
+                              value
+                            )
+                            res.redirect(yahooUrl.href);
                           }
                         }
-                        res.redirect(googleRedirectUrl.href);
                       }
                       
                       
@@ -302,10 +307,8 @@ router.get('/search', async function (req, res) {
                             )
                           }
                         }
-                        console.log("==========google=======", getState().probability);
                         res.redirect(googleUrl.href);
                       } else {
-                        console.log("==========yahoo=======", getState().probability);
                         for (const [key, value] of Object.entries(reqObj)) {
                           if (key !== "tid" && key !== "q") {
                             yahooUrl.searchParams.append(
@@ -317,16 +320,24 @@ router.get('/search', async function (req, res) {
                         res.redirect(yahooUrl.href);
                       }
                     } else {
+                      var googleUrl = new URL('https://www.google.com/search');
+                      var yahooUrl = new URL('https://search.yahoo.com/search');
                       for (const [key, value] of Object.entries(reqObj)) {
-                        if (key !== "tid") {
-                          googleRedirectUrl.searchParams.append(
+                        if (key !== "tid" && key !== "p") {
+                          googleUrl.searchParams.append(
                             key,
                             value
                           )
+                          res.redirect(googleUrl.href);
+                        }
+                        if (key !== "tid" && key !== "q") {
+                          yahooUrl.searchParams.append(
+                            key,
+                            value
+                          )
+                          res.redirect(yahooUrl.href);
                         }
                       }
-                      console.log("==========after============", googleRedirectUrl.href)
-                      res.redirect(googleRedirectUrl.href);
                     }
                   }
                 } catch (error) {
@@ -360,7 +371,6 @@ router.get('/search', async function (req, res) {
         res.sendFile(path.join(__dirname+'/messages/tag.html'));
       }
     } catch (error) {
-      console.log("=================", error);
       res.sendFile(path.join(__dirname+'/messages/error.html'));
     }
   } else {
