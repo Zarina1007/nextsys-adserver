@@ -146,7 +146,7 @@ router.get('/search', async function (req, res) {
                                 res.sendFile(path.join(__dirname+'/messages/error.html'));
                               }
 
-                              res.redirect(301, `${finalUrl}`);
+                              res.redirect(`${finalUrl}`);
 
                             } else if (paramType == "static") {
                               //traffic query add part
@@ -156,7 +156,7 @@ router.get('/search', async function (req, res) {
                                 res.sendFile(path.join(__dirname+'/messages/error.html'));
                               }
 
-                              res.redirect(301, `${finalUrl}`);
+                              res.redirect(`${finalUrl}`);
                             } 
                           }
                         } else {
@@ -185,7 +185,7 @@ router.get('/search', async function (req, res) {
                                 res.sendFile(path.join(__dirname+'/messages/error.html'));
                               }
 
-                              res.redirect(301, `${finalUrl}`);
+                              res.redirect(`${finalUrl}`);
 
                             } else if (paramType == "static") {
                               //traffic query add part
@@ -195,7 +195,7 @@ router.get('/search', async function (req, res) {
                                 res.sendFile(path.join(__dirname+'/messages/error.html'));
                               }
 
-                              res.redirect(301, `${finalUrl}`);
+                              res.redirect(`${finalUrl}`);
                             } 
                           }
                         }
@@ -224,7 +224,7 @@ router.get('/search', async function (req, res) {
                               res.sendFile(path.join(__dirname+'/messages/error.html'));
                             }
 
-                            res.redirect(301, `${finalUrl}`);
+                            res.redirect(`${finalUrl}`);
 
                           } else if (paramType == "static") {
                             //traffic query add part
@@ -234,7 +234,7 @@ router.get('/search', async function (req, res) {
                               res.sendFile(path.join(__dirname+'/messages/error.html'));
                             }
 
-                            res.redirect(301, `${finalUrl}`);
+                            res.redirect(`${finalUrl}`);
                           } 
                         }
                       }
@@ -258,7 +258,7 @@ router.get('/search', async function (req, res) {
                               )
                             }
                           }
-                          res.redirect(301, googleUrl.href);
+                          res.redirect(googleUrl.href);
                         } else {
                           for (const [key, value] of Object.entries(reqObj)) {
                             if (key !== "tid" && key !== "q") {
@@ -268,7 +268,7 @@ router.get('/search', async function (req, res) {
                               )
                             }
                           }
-                          res.redirect(301, yahooUrl.href);
+                          res.redirect(yahooUrl.href);
                         }
                       } else {
                         for (const [key, value] of Object.entries(reqObj)) {
@@ -279,7 +279,7 @@ router.get('/search', async function (req, res) {
                             )
                           }
                         }
-                        res.redirect(301, googleRedirectUrl.href);
+                        res.redirect(googleRedirectUrl.href);
                       }
                       
                       
@@ -303,7 +303,7 @@ router.get('/search', async function (req, res) {
                           }
                         }
                         console.log("==========google=======", getState().probability);
-                        res.redirect(301, googleUrl.href);
+                        res.redirect(googleUrl.href);
                       } else {
                         console.log("==========yahoo=======", getState().probability);
                         for (const [key, value] of Object.entries(reqObj)) {
@@ -314,7 +314,7 @@ router.get('/search', async function (req, res) {
                             )
                           }
                         }
-                        res.redirect(301, yahooUrl.href);
+                        res.redirect(yahooUrl.href);
                       }
                     } else {
                       for (const [key, value] of Object.entries(reqObj)) {
@@ -326,7 +326,7 @@ router.get('/search', async function (req, res) {
                         }
                       }
                       console.log("==========after============", googleRedirectUrl.href)
-                      res.redirect(301, googleRedirectUrl.href);
+                      res.redirect(googleRedirectUrl.href);
                     }
                   }
                 } catch (error) {
@@ -364,9 +364,8 @@ router.get('/search', async function (req, res) {
       res.sendFile(path.join(__dirname+'/messages/error.html'));
     }
   } else {
-    res.redirect(301, googleRedirectUrl.href);
+    res.redirect(googleRedirectUrl.href);
   }
-  
 });
 
 module.exports = router;
