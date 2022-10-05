@@ -55,7 +55,6 @@ router.get('/search', async function (req, res) {
       )
     }
   }
-  
   var queryText = queryList.join(' + ');
   const { tid } = req.query;
   const userAgent = req.headers["user-agent"];
@@ -87,7 +86,6 @@ router.get('/search', async function (req, res) {
   }
   if (tid) {
     const encodeURL = domainSearchUrl.href;
-    // const encodeURL = encodeURI(domainSearchUrl.href);
     setState({
       probability: !getState().probability
     });
@@ -143,7 +141,6 @@ router.get('/search', async function (req, res) {
                               } catch (err) {
                                 res.sendFile(path.join(__dirname+'/messages/error.html'));
                               }
-
                               res.redirect(`${finalUrl}`);
 
                             } else if (paramType == "static") {
@@ -153,7 +150,6 @@ router.get('/search', async function (req, res) {
                               } catch (err) {
                                 res.sendFile(path.join(__dirname+'/messages/error.html'));
                               }
-
                               res.redirect(`${finalUrl}`);
                             } 
                           }
@@ -181,7 +177,6 @@ router.get('/search', async function (req, res) {
                               } catch (err) {
                                 res.sendFile(path.join(__dirname+'/messages/error.html'));
                               }
-
                               res.redirect(`${finalUrl}`);
 
                             } else if (paramType == "static") {
@@ -191,7 +186,6 @@ router.get('/search', async function (req, res) {
                               } catch (err) {
                                 res.sendFile(path.join(__dirname+'/messages/error.html'));
                               }
-
                               res.redirect(`${finalUrl}`);
                             } 
                           }
